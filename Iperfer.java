@@ -30,16 +30,18 @@ public class Iperfer {
 
         try (
                 Socket socket = new Socket(hostName, server_port);
-                DataOutputStream out = new DataOutputStream(socket.getOutputStream());) {
+                OutputStream out = socket.getOutputStream();) {
             long start = System.currentTimeMillis();
             long end = start + t_ms;
             while (System.currentTimeMillis() < end) {
                 out.write(KB);
-                sent++;
+                sent ++;
+                out.flush();
             }
             out.close();
             socket.close();
-            double rate = sent * 0.008;
+            double rate = sent * 0.008 / (double)time;
+            System.out.println(time);
             System.out.println("sent=" + sent + " KB rate=" + rate + " Mbps");
         } catch (Exception e) {
             System.out.println("error in client line 41 ");
@@ -56,17 +58,21 @@ public class Iperfer {
         try (
             ServerSocket serverSocket = new ServerSocket(portNumber);
             Socket clientSocket = serverSocket.accept();
-            DataInputStream in = new DataInputStream(clientSocket.getInputStream());
+            InputStream in = clientSocket.getInputStream();
         ) {
+            long start = System.currentTimeMillis();
             while(in.read() != -1){
-                in.read(KB);
-                receive ++; 
+                receive += in.read(KB);
             }
+            receive /= 1000;
+            long end = System.currentTimeMillis(); 
+            long elapse = (end - start) / 1000; 
             in.close();
             clientSocket.close();
             serverSocket.close();
-            double rate = receive * 0.008;
-            System.out.println("sent=" + receive + " KB rate=" + rate + " Mbps");
+            double rate = receive * 0.008 / elapse;
+            System.out.println(elapse);
+            System.out.println("received=" + receive + " KB rate=" + rate + " Mbps"); 
         } catch(Exception e){
             System.out.println("server error line 66");
             System.exit(1);
