@@ -34,7 +34,7 @@ public class Iperfer {
     public void server(Integer portNumber) {
 
         byte[] KB = new byte[1000];
-        int received = 0;
+        double received = 0;
         try (
                 ServerSocket serverSocket = new ServerSocket(portNumber);
                 Socket clientSocket = serverSocket.accept();
